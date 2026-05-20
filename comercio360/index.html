@@ -1,0 +1,1086 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#1e63d7" />
+<title>Comercio 360 — Prototipo</title>
+<style>
+  :root {
+    --primary: #1e63d7;
+    --primary-dark: #1551b5;
+    --primary-soft: #e8f0fd;
+    --primary-softer: #f3f7fe;
+    --bg: #f4f6fa;
+    --surface: #ffffff;
+    --text: #0f1b2d;
+    --text-muted: #6b7a90;
+    --border: #e3e8f0;
+    --success: #1aa260;
+    --danger: #d64545;
+    --warning: #f1a017;
+    --shadow: 0 8px 24px rgba(16, 36, 75, 0.08);
+    --shadow-card: 0 2px 8px rgba(16, 36, 75, 0.05);
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #d9dee6;
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .device {
+    width: 100%;
+    max-width: 390px;
+    height: min(844px, calc(100vh - 48px));
+    background: var(--surface);
+    border-radius: 44px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25), 0 0 0 12px #111 inset, 0 0 0 14px #2a2a2a;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  @media (max-width: 480px) {
+    body { padding: 0; background: var(--surface); }
+    .device {
+      max-width: 100%;
+      height: 100vh;
+      border-radius: 0;
+      box-shadow: none;
+    }
+  }
+
+  .status-bar {
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    background: transparent;
+    position: relative;
+    z-index: 10;
+  }
+  .status-bar .icons { display: flex; gap: 5px; align-items: center; }
+
+  .screens {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  .screen {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: none;
+    flex-direction: column;
+  }
+  .screen.active { display: flex; }
+
+  /* === Login === */
+  .login {
+    flex: 1;
+    background: linear-gradient(180deg, #d8dee9 0%, #c4ccd9 100%);
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+  }
+  .login-logo-wrap {
+    background: var(--surface);
+    border-radius: 18px;
+    padding: 24px;
+    margin: 12px 0 36px;
+    display: grid;
+    place-items: center;
+    box-shadow: var(--shadow-card);
+  }
+  .login-logo {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .login-logo .brand-text {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.5px;
+    line-height: 1;
+  }
+  .login-logo .brand-360 {
+    color: var(--primary);
+  }
+  .login-logo svg { width: 32px; height: 26px; color: var(--primary); margin-left: 2px; }
+
+  .welcome { font-size: 26px; font-weight: 700; margin: 0 0 22px; }
+
+  .field-group { display: flex; flex-direction: column; gap: 12px; }
+  .login-input-wrap { position: relative; }
+  .login-input {
+    width: 100%;
+    height: 48px;
+    border: none;
+    border-radius: 12px;
+    padding: 0 16px;
+    font-size: 15px;
+    background: rgba(255, 255, 255, 0.85);
+    color: var(--text);
+    font-family: inherit;
+    transition: box-shadow 0.15s;
+  }
+  .login-input::placeholder { color: #9aa6b8; }
+  .login-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--primary);
+    background: #fff;
+  }
+  .password-toggle {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 4px;
+  }
+  .password-toggle svg { width: 18px; height: 18px; }
+
+  .forgot {
+    align-self: flex-start;
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 4px 0;
+    margin-top: 4px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .forgot:hover { text-decoration: underline; }
+
+  .login-btn {
+    margin-top: 14px;
+    width: 100%;
+    height: 50px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.05s;
+    font-family: inherit;
+  }
+  .login-btn:hover { background: var(--primary-dark); }
+  .login-btn:active { transform: scale(0.99); }
+
+  .register-row {
+    text-align: center;
+    margin-top: 22px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .register-row a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .register-row a:hover { text-decoration: underline; }
+
+  .or-divider {
+    text-align: center;
+    margin: 24px 0 14px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .social-row {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+  }
+  .social-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    transition: transform 0.05s;
+  }
+  .social-btn:hover { transform: scale(1.05); }
+  .social-btn.google { background: #db4437; }
+  .social-btn.apple { background: #111; }
+  .social-btn.facebook { background: #1877f2; }
+  .social-btn svg { width: 20px; height: 20px; }
+
+  /* === App shell (screens 2-5) === */
+  .app-screen {
+    background: var(--bg);
+  }
+  .app-header {
+    flex-shrink: 0;
+    padding: 8px 20px 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface);
+  }
+  .header-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #d6dde8;
+    display: grid;
+    place-items: center;
+    color: var(--text-muted);
+  }
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text);
+  }
+  .header-brand .brand-360 { color: var(--primary); }
+  .header-brand svg { width: 18px; height: 14px; color: var(--primary); margin-left: 2px; }
+
+  .app-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 20px 12px;
+  }
+  .app-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 4px 0 16px;
+  }
+
+  /* === Dashboard === */
+  .sales-card {
+    background: var(--primary-softer);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow-card);
+  }
+  .sales-card .label {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .sales-total {
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 4px 0 12px;
+    letter-spacing: -0.5px;
+  }
+  .sales-meta {
+    font-size: 13px;
+    color: var(--text);
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+  .sales-meta div { display: flex; justify-content: space-between; }
+  .sales-meta span:first-child { color: var(--text-muted); }
+  .sales-meta span:last-child { font-weight: 600; }
+
+  .chart {
+    width: 100%;
+    height: 110px;
+  }
+  .chart-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .section-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 18px 0 10px;
+  }
+  .product-row {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 14px 16px;
+    box-shadow: var(--shadow-card);
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .product-row + .product-row { margin-top: 10px; }
+  .product-row .qty { color: var(--text-muted); font-size: 13px; }
+
+  /* === Reportes === */
+  .field-block { margin-bottom: 14px; }
+  .field-block label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .select-field {
+    width: 100%;
+    height: 46px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0 14px;
+    font-size: 15px;
+    background: var(--surface);
+    color: var(--text);
+    font-family: inherit;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%236b7a90' d='M6 8L0 0h12z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 38px;
+  }
+  .select-field:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30, 99, 215, 0.15);
+  }
+  .btn-outline {
+    width: 100%;
+    height: 46px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    font-family: inherit;
+    margin-bottom: 18px;
+    transition: background 0.15s;
+  }
+  .btn-outline:hover { background: #f7f9fc; }
+
+  .report-card {
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: var(--shadow-card);
+    margin-bottom: 12px;
+  }
+  .report-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .report-downloads {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .download-link {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: inherit;
+  }
+  .download-link:hover { text-decoration: underline; }
+  .download-link svg { width: 14px; height: 14px; }
+  .download-link.pdf { color: #d64545; }
+  .download-link.csv { color: var(--success); }
+  .report-date {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: right;
+    margin-top: 4px;
+  }
+
+  /* === Liquidez === */
+  .liquidity-intro {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.5;
+    margin: 0 0 18px;
+  }
+  .liquidity-card {
+    background: var(--primary-softer);
+    border-radius: 16px;
+    padding: 18px;
+    text-align: center;
+    margin-bottom: 22px;
+    box-shadow: var(--shadow-card);
+  }
+  .liquidity-card .label {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .liquidity-amount {
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: -0.5px;
+  }
+  .badge-new {
+    display: inline-block;
+    background: var(--primary-soft);
+    color: var(--primary);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .liquidity-cta-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+  .btn-primary-big {
+    width: 100%;
+    height: 52px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s, transform 0.05s;
+  }
+  .btn-primary-big:hover { background: var(--primary-dark); }
+  .btn-primary-big:active { transform: scale(0.99); }
+  .btn-primary-big:disabled { opacity: 0.6; cursor: not-allowed; }
+  .liquidity-note {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 12px;
+  }
+
+  /* === Dispersión === */
+  .balance-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 18px;
+    text-align: center;
+  }
+  .balance-box .label {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .balance-amount {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+    margin-top: 4px;
+    letter-spacing: -0.5px;
+  }
+  .dispersion-card {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--border);
+  }
+  .dispersion-card.highlight {
+    border-color: var(--primary);
+    background: var(--primary-softer);
+  }
+  .dispersion-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .dispersion-btn {
+    width: 100%;
+    height: 44px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    margin-bottom: 10px;
+    transition: background 0.15s;
+  }
+  .dispersion-btn:hover { background: var(--primary-dark); }
+  .dispersion-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+  .dispersion-desc strong { color: var(--text); font-weight: 600; }
+
+  /* === Bottom nav === */
+  .bottom-nav {
+    display: flex;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 8px 0 14px;
+    flex-shrink: 0;
+  }
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 500;
+    font-family: inherit;
+    padding: 4px;
+  }
+  .nav-item svg { width: 22px; height: 22px; }
+  .nav-item.active { color: var(--primary); }
+
+  /* Toast */
+  .toast {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(40px);
+    background: #0f1b2d;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 100;
+    max-width: 80%;
+    text-align: center;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Dev nav */
+  .dev-nav {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    background: rgba(15, 27, 45, 0.9);
+    color: #fff;
+    border-radius: 10px;
+    padding: 6px;
+    display: flex;
+    gap: 4px;
+    z-index: 200;
+    font-size: 11px;
+    backdrop-filter: blur(8px);
+  }
+  .dev-nav button {
+    background: transparent;
+    border: none;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+  }
+  .dev-nav button:hover { background: rgba(255, 255, 255, 0.15); }
+  .dev-nav button.current { background: var(--primary); }
+  @media (max-width: 480px) {
+    .dev-nav { top: auto; bottom: 8px; right: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="dev-nav" id="devNav">
+  <button data-go="login" class="current">1</button>
+  <button data-go="dashboard">2</button>
+  <button data-go="reportes">3</button>
+  <button data-go="liquidez">4</button>
+  <button data-go="dispersion">5</button>
+</div>
+
+<div class="device">
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="icons">
+      <svg width="16" height="10" viewBox="0 0 16 10" fill="currentColor"><rect x="0" y="6" width="3" height="4" rx="0.5"/><rect x="4" y="4" width="3" height="6" rx="0.5"/><rect x="8" y="2" width="3" height="8" rx="0.5"/><rect x="12" y="0" width="3" height="10" rx="0.5"/></svg>
+      <svg width="14" height="10" viewBox="0 0 14 10" fill="currentColor"><path d="M7 2C4.5 2 2.3 3 0.6 4.7L7 11 13.4 4.7C11.7 3 9.5 2 7 2z"/></svg>
+      <svg width="22" height="10" viewBox="0 0 22 10" fill="none" stroke="currentColor"><rect x="0.5" y="0.5" width="18" height="9" rx="2"/><rect x="2" y="2" width="14" height="6" rx="1" fill="currentColor"/><rect x="20" y="3.5" width="1.5" height="3" rx="0.5" fill="currentColor"/></svg>
+    </span>
+  </div>
+
+  <div class="screens" id="screens">
+
+    <!-- ============== SCREEN 1: Login ============== -->
+    <section class="screen active" data-screen="login">
+      <div class="login">
+        <div class="login-logo-wrap">
+          <div class="login-logo">
+            <span class="brand-text">COMERCIO</span>
+            <span class="brand-text brand-360">360</span>
+            <svg viewBox="0 0 24 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 16L8 10L12 14L22 4"/>
+              <path d="M22 4L22 10M22 4L16 4"/>
+            </svg>
+          </div>
+        </div>
+
+        <h1 class="welcome">Welcome!</h1>
+
+        <form class="field-group" id="login-form" novalidate>
+          <div class="login-input-wrap">
+            <input class="login-input" name="nit" placeholder="Business ID (NIT)" required />
+          </div>
+          <div class="login-input-wrap">
+            <input class="login-input" id="password-input" type="password" name="password" placeholder="Password" required />
+            <button type="button" class="password-toggle" id="password-toggle" aria-label="Mostrar/ocultar contraseña">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+          <button type="button" class="forgot" data-action="forgot">Forgot password?</button>
+          <button type="submit" class="login-btn">Login</button>
+        </form>
+
+        <div class="register-row">
+          Not a member? <a data-action="register">Register now</a>
+        </div>
+
+        <div class="or-divider">Or continue with</div>
+        <div class="social-row">
+          <button class="social-btn google" data-provider="Google" aria-label="Google">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.35 11.1h-9.17v2.73h6.51c-.33 3.81-3.5 5.44-6.5 5.44C8.36 19.27 5 16.25 5 12c0-4.1 3.2-7.27 7.2-7.27 3.09 0 4.9 1.97 4.9 1.97L19 4.72S16.56 2 12.1 2C6.42 2 2.03 6.8 2.03 12c0 5.05 4.13 10 10.22 10 5.35 0 9.25-3.67 9.25-9.09 0-1.15-.15-1.81-.15-1.81z"/></svg>
+          </button>
+          <button class="social-btn apple" data-provider="Apple" aria-label="Apple">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+          </button>
+          <button class="social-btn facebook" data-provider="Facebook" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== SCREEN 2: Dashboard ============== -->
+    <section class="screen app-screen" data-screen="dashboard">
+      <div class="app-header">
+        <div class="header-avatar" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+        </div>
+        <div class="header-brand">
+          <span>COMERCIO</span>
+          <span class="brand-360">360</span>
+          <svg viewBox="0 0 24 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 16L8 10L12 14L22 4"/>
+            <path d="M22 4L22 10M22 4L16 4"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="app-body">
+        <h1 class="app-title">Ventas del Mes</h1>
+
+        <div class="sales-card">
+          <div class="label">Ventas Totales</div>
+          <div class="sales-total">$4,500,000 COP</div>
+          <div class="sales-meta">
+            <div><span>Transacciones:</span><span>312</span></div>
+            <div><span>Promedio por venta:</span><span>$14,423</span></div>
+          </div>
+          <svg class="chart" viewBox="0 0 320 100" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#1e63d7" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="#1e63d7" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,75 L40,68 L80,80 L120,55 L160,62 L200,40 L240,48 L280,25 L320,15 L320,100 L0,100 Z" fill="url(#g1)"/>
+            <polyline points="0,75 40,68 80,80 120,55 160,62 200,40 240,48 280,25 320,15" fill="none" stroke="#1e63d7" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            <circle cx="280" cy="25" r="3.5" fill="#1e63d7"/>
+          </svg>
+          <div class="chart-labels">
+            <span>Oct 1</span><span>9</span><span>15</span><span>22</span><span>31</span>
+          </div>
+        </div>
+
+        <h2 class="section-title">Mejores Productos</h2>
+        <div class="product-row">
+          <span>Servicio de Limpieza</span>
+          <span class="qty">x102</span>
+        </div>
+        <div class="product-row">
+          <span>Kit de Suministros</span>
+          <span class="qty">x78</span>
+        </div>
+      </div>
+
+      <nav class="bottom-nav">
+        <button class="nav-item active" data-tab="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+          Dashboard
+        </button>
+        <button class="nav-item" data-tab="reportes">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8M8 9h2"/></svg>
+          Reportes
+        </button>
+        <button class="nav-item" data-tab="liquidez">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M9 9.5c0-1 1-1.5 3-1.5s3 .5 3 1.5-1 1.5-3 1.5-3 .5-3 1.5 1 1.5 3 1.5 3-.5 3-1.5"/></svg>
+          Financiación
+        </button>
+        <button class="nav-item" data-tab="dispersion">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6M5 9l4 4M19 9l-4 4M3 17h6M15 17h6M9 21l3-4 3 4"/></svg>
+          Dispersión
+        </button>
+      </nav>
+    </section>
+
+    <!-- ============== SCREEN 3: Reportes ============== -->
+    <section class="screen app-screen" data-screen="reportes">
+      <div class="app-header">
+        <div class="header-avatar" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+        </div>
+        <div class="header-brand">
+          <span>COMERCIO</span>
+          <span class="brand-360">360</span>
+          <svg viewBox="0 0 24 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 16L8 10L12 14L22 4"/>
+            <path d="M22 4L22 10M22 4L16 4"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="app-body">
+        <h1 class="app-title">Reportes y Descargas</h1>
+
+        <div class="field-block">
+          <label>Período</label>
+          <select class="select-field" id="report-period">
+            <option>Octubre 2023</option>
+            <option>Septiembre 2023</option>
+            <option>Agosto 2023</option>
+            <option>Q3 2023</option>
+          </select>
+        </div>
+
+        <div class="field-block">
+          <label>Tipo de Reporte</label>
+          <select class="select-field" id="report-type">
+            <option>Ventas Detalladas</option>
+            <option>Reporte de Impuestos</option>
+            <option>Inventario Mensual</option>
+            <option>Flujo de Caja</option>
+          </select>
+        </div>
+
+        <button class="btn-outline" data-action="generate-report">Generar Nuevo Reporte</button>
+
+        <div class="report-card">
+          <div class="report-title">Ventas Detalladas - Oct 1-15</div>
+          <div class="report-downloads">
+            <button class="download-link pdf" data-download="pdf" data-name="Ventas Detalladas Oct 1-15">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+              Descargar PDF
+            </button>
+            <button class="download-link csv" data-download="csv" data-name="Ventas Detalladas Oct 1-15">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+              Descargar CSV
+            </button>
+          </div>
+          <div class="report-date">Oct 16, 2023</div>
+        </div>
+
+        <div class="report-card">
+          <div class="report-title">Reporte de Impuestos - Q3</div>
+          <div class="report-downloads">
+            <button class="download-link pdf" data-download="pdf" data-name="Reporte de Impuestos Q3">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+              Descargar PDF
+            </button>
+          </div>
+          <div class="report-date">Sep 30, 2023</div>
+        </div>
+
+        <div class="report-card">
+          <div class="report-title">Inventario Mensual - Sep</div>
+          <div class="report-downloads">
+            <button class="download-link csv" data-download="csv" data-name="Inventario Mensual Sep">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+              Descargar CSV
+            </button>
+          </div>
+          <div class="report-date">Oct 2, 2023</div>
+        </div>
+      </div>
+
+      <nav class="bottom-nav">
+        <button class="nav-item" data-tab="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+          Dashboard
+        </button>
+        <button class="nav-item active" data-tab="reportes">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8M8 9h2"/></svg>
+          Reportes
+        </button>
+        <button class="nav-item" data-tab="liquidez">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M9 9.5c0-1 1-1.5 3-1.5s3 .5 3 1.5-1 1.5-3 1.5-3 .5-3 1.5 1 1.5 3 1.5 3-.5 3-1.5"/></svg>
+          Financiación
+        </button>
+        <button class="nav-item" data-tab="dispersion">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6M5 9l4 4M19 9l-4 4M3 17h6M15 17h6M9 21l3-4 3 4"/></svg>
+          Dispersión
+        </button>
+      </nav>
+    </section>
+
+    <!-- ============== SCREEN 4: Solicitar Liquidez ============== -->
+    <section class="screen app-screen" data-screen="liquidez">
+      <div class="app-header">
+        <div class="header-avatar" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+        </div>
+        <div class="header-brand">
+          <span>COMERCIO</span>
+          <span class="brand-360">360</span>
+          <svg viewBox="0 0 24 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 16L8 10L12 14L22 4"/>
+            <path d="M22 4L22 10M22 4L16 4"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="app-body">
+        <h1 class="app-title">Solicitar Liquidez</h1>
+        <p class="liquidity-intro">Adelanta tus ventas basadas en tu histórico de transacciones de los últimos 3 meses.</p>
+
+        <div class="liquidity-card">
+          <div class="label">Liquidez Disponible</div>
+          <div class="liquidity-amount">$500,000 COP</div>
+        </div>
+
+        <div style="text-align: center;">
+          <span class="badge-new">¡Nuevo!</span>
+          <div class="liquidity-cta-label">Activar botón</div>
+        </div>
+
+        <button class="btn-primary-big" id="btn-solicitar-adelanto">Solicitar Adelanto de $500,000</button>
+        <p class="liquidity-note">Sujeto a aprobación en &lt; 1 hora.</p>
+      </div>
+
+      <nav class="bottom-nav">
+        <button class="nav-item" data-tab="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+          Dashboard
+        </button>
+        <button class="nav-item" data-tab="reportes">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8M8 9h2"/></svg>
+          Reportes
+        </button>
+        <button class="nav-item active" data-tab="liquidez">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M9 9.5c0-1 1-1.5 3-1.5s3 .5 3 1.5-1 1.5-3 1.5-3 .5-3 1.5 1 1.5 3 1.5 3-.5 3-1.5"/></svg>
+          Financiación
+        </button>
+        <button class="nav-item" data-tab="dispersion">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6M5 9l4 4M19 9l-4 4M3 17h6M15 17h6M9 21l3-4 3 4"/></svg>
+          Dispersión
+        </button>
+      </nav>
+    </section>
+
+    <!-- ============== SCREEN 5: Dispersión ============== -->
+    <section class="screen app-screen" data-screen="dispersion">
+      <div class="app-header">
+        <div class="header-avatar" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+        </div>
+        <div class="header-brand">
+          <span>COMERCIO</span>
+          <span class="brand-360">360</span>
+          <svg viewBox="0 0 24 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 16L8 10L12 14L22 4"/>
+            <path d="M22 4L22 10M22 4L16 4"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="app-body">
+        <h1 class="app-title">Dispersión de Fondos</h1>
+
+        <div class="balance-box">
+          <div class="label">Saldo Dispersable Actual</div>
+          <div class="balance-amount" id="saldo-dispersable">$1,200,000 COP</div>
+        </div>
+
+        <div class="dispersion-card">
+          <div class="dispersion-title">Dispersión Estándar (8 días)</div>
+          <button class="dispersion-btn" data-dispersion="standard">Dispersar Saldo Total</button>
+          <p class="dispersion-desc">Abono a cuenta bancaria en <strong>8 días hábiles</strong>. <br>Tasa: <strong>0% extra</strong>.</p>
+        </div>
+
+        <div class="dispersion-card highlight">
+          <div class="dispersion-title">Dispersión Rápida (&lt;24h)</div>
+          <button class="dispersion-btn" data-dispersion="fast">Dispersión Rápida (&lt;24h)</button>
+          <p class="dispersion-desc">Adelanta tu cobro con una tasa mayor. <br>Tasa de dispersión rápida: <strong>3.5% del monto</strong>. <br>Tasa destacada: Abono en menos de <strong>24h hábiles</strong>.</p>
+        </div>
+      </div>
+
+      <nav class="bottom-nav">
+        <button class="nav-item" data-tab="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+          Dashboard
+        </button>
+        <button class="nav-item" data-tab="reportes">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8M8 9h2"/></svg>
+          Reportes
+        </button>
+        <button class="nav-item" data-tab="liquidez">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M9 9.5c0-1 1-1.5 3-1.5s3 .5 3 1.5-1 1.5-3 1.5-3 .5-3 1.5 1 1.5 3 1.5 3-.5 3-1.5"/></svg>
+          Financiación
+        </button>
+        <button class="nav-item active" data-tab="dispersion">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6M5 9l4 4M19 9l-4 4M3 17h6M15 17h6M9 21l3-4 3 4"/></svg>
+          Dispersión
+        </button>
+      </nav>
+    </section>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+  function showScreen(name) {
+    $$('.screen').forEach(s => s.classList.toggle('active', s.dataset.screen === name));
+    $$('#devNav button').forEach(b => b.classList.toggle('current', b.dataset.go === name));
+    const active = $(`.screen[data-screen="${name}"]`);
+    if (active) {
+      active.scrollTop = 0;
+      const body = active.querySelector('.app-body');
+      if (body) body.scrollTop = 0;
+    }
+  }
+
+  function toast(msg, ms = 1800) {
+    const el = $('#toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => el.classList.remove('show'), ms);
+  }
+
+  // Dev nav
+  $$('#devNav button').forEach(b => {
+    b.addEventListener('click', () => showScreen(b.dataset.go));
+  });
+
+  // Login
+  $('#login-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const data = new FormData(e.currentTarget);
+    if (!data.get('nit') || !data.get('password')) {
+      toast('Ingresa tu NIT y contraseña');
+      return;
+    }
+    showScreen('dashboard');
+  });
+
+  $('#password-toggle').addEventListener('click', () => {
+    const input = $('#password-input');
+    input.type = input.type === 'password' ? 'text' : 'password';
+  });
+
+  $$('[data-provider]').forEach(b => b.addEventListener('click', () => {
+    toast(`Continuar con ${b.dataset.provider} (pendiente)`);
+  }));
+  $$('[data-action="forgot"]').forEach(b => b.addEventListener('click', () => toast('Recuperar contraseña (pendiente)')));
+  $$('[data-action="register"]').forEach(b => b.addEventListener('click', () => toast('Pantalla de registro (pendiente)')));
+
+  // Bottom nav (works across all 4 app screens)
+  $$('.nav-item[data-tab]').forEach(b => {
+    b.addEventListener('click', () => showScreen(b.dataset.tab));
+  });
+
+  // Reportes
+  $$('[data-action="generate-report"]').forEach(b => b.addEventListener('click', () => {
+    const period = $('#report-period').value;
+    const type = $('#report-type').value;
+    toast(`Generando: ${type} · ${period}`);
+  }));
+  $$('[data-download]').forEach(b => b.addEventListener('click', () => {
+    toast(`Descargando ${b.dataset.name} (${b.dataset.download.toUpperCase()})`);
+  }));
+
+  // Liquidez
+  $('#btn-solicitar-adelanto').addEventListener('click', e => {
+    const btn = e.currentTarget;
+    btn.disabled = true;
+    btn.textContent = 'Procesando solicitud…';
+    setTimeout(() => {
+      btn.textContent = '✓ Solicitud enviada';
+      toast('Adelanto en revisión. Aprobación en < 1 hora.');
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = 'Solicitar Adelanto de $500,000';
+      }, 2500);
+    }, 1200);
+  });
+
+  // Dispersión
+  $$('[data-dispersion]').forEach(b => b.addEventListener('click', () => {
+    const type = b.dataset.dispersion;
+    const fee = type === 'fast' ? 0.035 : 0;
+    const gross = 1200000;
+    const net = Math.round(gross * (1 - fee));
+    const label = type === 'fast' ? 'Dispersión Rápida (<24h)' : 'Dispersión Estándar (8 días)';
+    toast(`${label}: $${net.toLocaleString('es-CO')} COP confirmado`);
+  }));
+</script>
+
+</body>
+</html>

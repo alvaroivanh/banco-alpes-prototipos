@@ -1,0 +1,1063 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#1e63d7" />
+<title>TarjetApp — Prototipo</title>
+<style>
+  :root {
+    --primary: #1e63d7;
+    --primary-dark: #1551b5;
+    --primary-soft: #e8f0fd;
+    --bg: #f4f6fa;
+    --surface: #ffffff;
+    --text: #0f1b2d;
+    --text-muted: #6b7a90;
+    --border: #e3e8f0;
+    --success: #1aa260;
+    --danger: #d64545;
+    --shadow: 0 8px 24px rgba(16, 36, 75, 0.08);
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #d9dee6;
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  /* Phone frame for desktop preview */
+  .device {
+    width: 100%;
+    max-width: 390px;
+    height: min(844px, calc(100vh - 48px));
+    background: var(--surface);
+    border-radius: 44px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25), 0 0 0 12px #111 inset, 0 0 0 14px #2a2a2a;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  @media (max-width: 480px) {
+    body { padding: 0; background: var(--surface); }
+    .device {
+      max-width: 100%;
+      height: 100vh;
+      border-radius: 0;
+      box-shadow: none;
+    }
+  }
+
+  /* Status bar (purely decorative on desktop) */
+  .status-bar {
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    background: transparent;
+    position: relative;
+    z-index: 10;
+  }
+  .status-bar .icons { display: flex; gap: 5px; align-items: center; }
+
+  /* Screen container */
+  .screens {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  .screen {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: none;
+    flex-direction: column;
+  }
+  .screen.active { display: flex; }
+  .screen-pad { padding: 0 24px 32px; }
+
+  /* Progress bar */
+  .progress-wrap {
+    padding: 8px 24px 16px;
+    flex-shrink: 0;
+  }
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .progress-track {
+    flex: 1;
+    height: 6px;
+    background: #e3e8f0;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 999px;
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    min-width: 36px;
+    text-align: right;
+  }
+
+  /* Typography */
+  h1 {
+    font-size: 26px;
+    line-height: 1.2;
+    margin: 8px 0 8px;
+    font-weight: 700;
+  }
+  .subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin: 0 0 20px;
+    line-height: 1.45;
+  }
+  label.field-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 14px 0 6px;
+    color: var(--text);
+  }
+
+  /* Inputs */
+  .input-wrap {
+    position: relative;
+    margin-bottom: 4px;
+  }
+  .input-wrap .icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+  }
+  .input, .select {
+    width: 100%;
+    height: 48px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0 14px;
+    font-size: 15px;
+    background: var(--surface);
+    color: var(--text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    font-family: inherit;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .input.with-icon { padding-left: 42px; }
+  .input:focus, .select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(30, 99, 215, 0.15);
+  }
+  .input::placeholder { color: #9aa6b8; }
+
+  .select {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%236b7a90' d='M6 8L0 0h12z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 38px;
+  }
+
+  /* Checkbox */
+  .checkbox-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 18px 0 18px;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.4;
+    cursor: pointer;
+    user-select: none;
+  }
+  .checkbox-row input { display: none; }
+  .checkbox-box {
+    width: 20px;
+    height: 20px;
+    border: 1.5px solid var(--border);
+    border-radius: 5px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: grid;
+    place-items: center;
+    transition: all 0.15s;
+  }
+  .checkbox-row input:checked + .checkbox-box {
+    background: var(--primary);
+    border-color: var(--primary);
+  }
+  .checkbox-row input:checked + .checkbox-box::after {
+    content: "";
+    width: 6px;
+    height: 10px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg) translate(-1px, -1px);
+  }
+
+  /* Buttons */
+  .btn {
+    width: 100%;
+    height: 50px;
+    border-radius: 12px;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.05s, background 0.15s, opacity 0.15s;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .btn-ghost {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: #f7f9fc; }
+  .link-btn {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-weight: 600;
+    cursor: pointer;
+    font-size: inherit;
+    font-family: inherit;
+    padding: 0;
+  }
+  .link-btn:hover { text-decoration: underline; }
+
+  /* === Screen 1: Splash === */
+  .splash {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 16px 24px 32px;
+  }
+  .splash-hero {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    text-align: center;
+  }
+  .logo {
+    width: 96px;
+    height: 96px;
+    background: var(--primary);
+    border-radius: 22px;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 12px 32px rgba(30, 99, 215, 0.35);
+  }
+  .logo svg { width: 56px; height: 56px; color: #fff; }
+  .brand {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin: 8px 0 0;
+  }
+  .brand-tag {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .splash-actions { display: flex; flex-direction: column; gap: 12px; }
+  .signin-row {
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-muted);
+    margin: 4px 0 12px;
+  }
+  .splash-footer {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 12px;
+  }
+  .icon-btn-content { display: flex; align-items: center; gap: 10px; }
+
+  /* === Screen 4: Identity verification === */
+  .id-content {
+    background: #0c1424;
+    color: #fff;
+    flex: 1;
+    margin: 0 -24px;
+    padding: 8px 24px 24px;
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .id-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .id-card {
+    background: #182238;
+    border: 1px dashed #3a4866;
+    border-radius: 14px;
+    padding: 18px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .id-card:hover { background: #1f2c47; }
+  .id-card.captured { background: #16321f; border-color: var(--success); }
+  .id-card svg { width: 32px; height: 32px; color: #8aa0c4; margin-bottom: 8px; }
+  .id-card.captured svg { color: var(--success); }
+  .id-card .label { font-size: 12px; font-weight: 600; }
+
+  .face-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 8px 0;
+  }
+  .face-ring {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    border: 2px solid #3a4866;
+    display: grid;
+    place-items: center;
+    position: relative;
+  }
+  .face-ring svg { width: 60px; height: 60px; color: #8aa0c4; }
+  .face-hints {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 16px;
+    font-size: 11px;
+    color: #8aa0c4;
+    text-align: center;
+    margin-top: 6px;
+  }
+  .face-hint-bottom { grid-column: span 2; }
+  .id-helper {
+    font-size: 12px;
+    color: #8aa0c4;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .id-status {
+    font-size: 11px;
+    color: #8aa0c4;
+    text-align: center;
+    margin-top: 12px;
+  }
+
+  /* === Screen 5: Home === */
+  .home {
+    flex: 1;
+    background: var(--bg);
+    overflow-y: auto;
+  }
+  .home-header {
+    padding: 8px 20px 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #d6dde8;
+    display: grid;
+    place-items: center;
+    color: var(--text-muted);
+  }
+  .header-icons { display: flex; gap: 12px; }
+  .header-icon-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: grid;
+    place-items: center;
+    position: relative;
+    cursor: pointer;
+    color: var(--text);
+  }
+  .header-icon-btn svg { width: 18px; height: 18px; }
+  .badge-dot {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    background: var(--danger);
+    border-radius: 50%;
+    border: 2px solid var(--surface);
+  }
+  .greeting {
+    padding: 14px 20px 8px;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .account-card {
+    margin: 8px 20px 0;
+    background: linear-gradient(135deg, #1e63d7 0%, #2a78ef 100%);
+    color: #fff;
+    border-radius: 18px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 12px 24px rgba(30, 99, 215, 0.25);
+  }
+  .account-card::after {
+    content: "";
+    position: absolute;
+    right: -40px;
+    bottom: -40px;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .account-card .label { font-size: 12px; opacity: 0.85; }
+  .account-card .number { font-size: 14px; font-weight: 600; margin: 2px 0 14px; letter-spacing: 0.5px; }
+  .account-card .balance-label { font-size: 12px; opacity: 0.85; }
+  .account-card .balance { font-size: 28px; font-weight: 700; margin-bottom: 14px; }
+  .account-actions { display: flex; gap: 10px; position: relative; z-index: 2; }
+  .account-btn {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.18);
+    border: none;
+    color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    backdrop-filter: blur(4px);
+  }
+  .account-btn:hover { background: rgba(255, 255, 255, 0.28); }
+  .account-btn svg { width: 14px; height: 14px; }
+  .carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin: 12px 0 8px;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    background: #c8d2e0;
+    border-radius: 50%;
+  }
+  .dot.active { background: var(--primary); width: 18px; border-radius: 999px; }
+  .products {
+    display: flex;
+    gap: 12px;
+    padding: 8px 20px 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .products::-webkit-scrollbar { display: none; }
+  .product {
+    flex: 0 0 140px;
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 14px 12px;
+    box-shadow: var(--shadow);
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 150px;
+  }
+  .product .chip {
+    height: 28px;
+    width: 38px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #f1c14a, #b8841f);
+    margin-bottom: 10px;
+  }
+  .product.debit .chip-bg { background: linear-gradient(135deg, #1aa260, #128347); }
+  .product.credit .chip-bg { background: linear-gradient(135deg, #1e2c47, #324363); }
+  .product.cdt .chip-bg { background: linear-gradient(135deg, #1e63d7, #2a78ef); }
+  .product-banner {
+    height: 40px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+  .product .title { font-size: 13px; font-weight: 700; margin-bottom: 4px; line-height: 1.2; }
+  .product .desc { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+  .product .cta {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    align-self: flex-start;
+  }
+  .product .cta:hover { background: var(--primary-dark); }
+  .product .cta.ghost { background: transparent; color: var(--primary); padding-left: 0; }
+
+  /* Bottom navigation */
+  .bottom-nav {
+    display: flex;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 8px 0 14px;
+    flex-shrink: 0;
+  }
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 500;
+    font-family: inherit;
+    padding: 4px;
+  }
+  .nav-item svg { width: 22px; height: 22px; }
+  .nav-item.active { color: var(--primary); }
+
+  /* Toast */
+  .toast {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(40px);
+    background: #0f1b2d;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 100;
+    max-width: 80%;
+    text-align: center;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Dev navigator (top-right helper for jumping screens) */
+  .dev-nav {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    background: rgba(15, 27, 45, 0.9);
+    color: #fff;
+    border-radius: 10px;
+    padding: 6px;
+    display: flex;
+    gap: 4px;
+    z-index: 200;
+    font-size: 11px;
+    backdrop-filter: blur(8px);
+  }
+  .dev-nav button {
+    background: transparent;
+    border: none;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+  }
+  .dev-nav button:hover { background: rgba(255, 255, 255, 0.15); }
+  .dev-nav button.current { background: var(--primary); }
+  @media (max-width: 480px) {
+    .dev-nav { top: auto; bottom: 8px; right: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="dev-nav" id="devNav" aria-label="Navegación de pantallas (dev)">
+  <button data-go="splash" class="current">1</button>
+  <button data-go="step1">2</button>
+  <button data-go="step2">3</button>
+  <button data-go="step3">4</button>
+  <button data-go="home">5</button>
+</div>
+
+<div class="device" role="application">
+  <div class="status-bar">
+    <span>9:41</span>
+    <span class="icons">
+      <svg width="16" height="10" viewBox="0 0 16 10" fill="currentColor"><rect x="0" y="6" width="3" height="4" rx="0.5"/><rect x="4" y="4" width="3" height="6" rx="0.5"/><rect x="8" y="2" width="3" height="8" rx="0.5"/><rect x="12" y="0" width="3" height="10" rx="0.5"/></svg>
+      <svg width="14" height="10" viewBox="0 0 14 10" fill="currentColor"><path d="M7 2C4.5 2 2.3 3 0.6 4.7L7 11 13.4 4.7C11.7 3 9.5 2 7 2z"/></svg>
+      <svg width="22" height="10" viewBox="0 0 22 10" fill="none" stroke="currentColor"><rect x="0.5" y="0.5" width="18" height="9" rx="2"/><rect x="2" y="2" width="14" height="6" rx="1" fill="currentColor"/><rect x="20" y="3.5" width="1.5" height="3" rx="0.5" fill="currentColor"/></svg>
+    </span>
+  </div>
+
+  <div class="screens" id="screens">
+
+    <!-- ============== SCREEN 1: Splash ============== -->
+    <section class="screen active" data-screen="splash">
+      <div class="splash">
+        <div class="splash-hero">
+          <div class="logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="5" width="20" height="14" rx="2"/>
+              <path d="M2 10h20"/>
+              <path d="M7 16l2-2 2 2 4-4"/>
+            </svg>
+          </div>
+          <h1 class="brand">TarjetApp</h1>
+          <p class="brand-tag">Tus finanzas, redefinidas.</p>
+        </div>
+        <div class="splash-actions">
+          <button class="btn btn-primary" data-action="go-step1">Crear Cuenta</button>
+          <div class="signin-row">
+            ¿Ya tienes cuenta? <button class="link-btn" data-action="signin">Iniciar Sesión</button>
+          </div>
+          <button class="btn btn-ghost" data-action="oauth" data-provider="Google">
+            <span class="icon-btn-content">
+              <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.12-.84 2.07-1.79 2.71v2.25h2.9c1.7-1.56 2.69-3.86 2.69-6.6z"/><path fill="#34A853" d="M9 18c2.43 0 4.46-.8 5.95-2.18l-2.9-2.25c-.8.54-1.83.86-3.05.86-2.35 0-4.33-1.58-5.04-3.71H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC04" d="M3.96 10.72A5.4 5.4 0 0 1 3.68 9c0-.6.1-1.18.28-1.72V4.95H.96A9 9 0 0 0 0 9c0 1.45.35 2.83.96 4.05l3-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .96 4.95l3 2.33C4.67 5.16 6.65 3.58 9 3.58z"/></svg>
+              Continuar con Google
+            </span>
+          </button>
+          <button class="btn btn-ghost" data-action="oauth" data-provider="Apple">
+            <span class="icon-btn-content">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+              Continuar con Apple
+            </span>
+          </button>
+        </div>
+        <p class="splash-footer">Términos y Condiciones · Tratamiento de Datos</p>
+      </div>
+    </section>
+
+    <!-- ============== SCREEN 2: Step 1 ============== -->
+    <section class="screen" data-screen="step1">
+      <div class="progress-wrap">
+        <div class="progress-row">
+          <div class="progress-track"><div class="progress-fill" style="width: 25%"></div></div>
+          <span class="progress-label">25%</span>
+        </div>
+      </div>
+      <form class="screen-pad" id="form-step1" novalidate>
+        <h1>¡Empecemos tu aventura!</h1>
+        <p class="subtitle">Completa tus datos para crear tu cuenta en Banco los Alpes</p>
+
+        <label class="field-label">Nombres</label>
+        <div class="input-wrap">
+          <input class="input" name="nombres" placeholder="ej: Nombre 1, Nombre 2" required />
+        </div>
+
+        <label class="field-label">Primer Apellido</label>
+        <div class="input-wrap">
+          <input class="input" name="apellido" placeholder="Primer Apellido" required />
+        </div>
+
+        <label class="field-label">Número de Documento</label>
+        <div class="input-wrap">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="12" r="2.5"/><path d="M14 10h5M14 14h5"/></svg>
+          <input class="input with-icon" name="documento" placeholder="DNI/Cédula" inputmode="numeric" required />
+        </div>
+
+        <label class="field-label">Correo Electrónico</label>
+        <div class="input-wrap">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+          <input class="input with-icon" name="email" type="email" placeholder="Correo Electrónico" required />
+        </div>
+
+        <label class="field-label">Teléfono Celular</label>
+        <div class="input-wrap">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></svg>
+          <input class="input with-icon" name="telefono" type="tel" placeholder="Teléfono Celular" inputmode="tel" required />
+        </div>
+
+        <label class="checkbox-row">
+          <input type="checkbox" name="terminos" required />
+          <span class="checkbox-box"></span>
+          <span>Acepto los Términos, Condiciones y Tratamiento de Datos.</span>
+        </label>
+
+        <button type="submit" class="btn btn-primary">Continuar</button>
+      </form>
+    </section>
+
+    <!-- ============== SCREEN 3: Step 2 ============== -->
+    <section class="screen" data-screen="step2">
+      <div class="progress-wrap">
+        <div class="progress-row">
+          <div class="progress-track"><div class="progress-fill" style="width: 50%"></div></div>
+          <span class="progress-label">50%</span>
+        </div>
+      </div>
+      <form class="screen-pad" id="form-step2" novalidate>
+        <h1>Conozcámonos un poco más</h1>
+        <p class="subtitle">Necesitamos algunos datos para completar tu perfil legal.</p>
+
+        <label class="field-label">Fecha de Nacimiento</label>
+        <input class="input" type="date" name="nacimiento" required />
+
+        <label class="field-label">Fecha de Expedición del Documento</label>
+        <input class="input" type="date" name="expedicion" required />
+
+        <label class="field-label">Actividad Principal</label>
+        <select class="select" name="actividad" required>
+          <option value="">ej: Estudiante</option>
+          <option>Estudiante</option>
+          <option>Empleado</option>
+          <option>Independiente</option>
+          <option>Pensionado</option>
+          <option>Empresario</option>
+          <option>Otro</option>
+        </select>
+
+        <label class="field-label">Rango de Ingresos Mensuales</label>
+        <select class="select" name="ingresos" required>
+          <option value="">ej: $1M – $3M</option>
+          <option>Menos de $1M</option>
+          <option>$1M – $3M</option>
+          <option>$3M – $5M</option>
+          <option>$5M – $10M</option>
+          <option>Más de $10M</option>
+        </select>
+
+        <label class="field-label">Rango de Gastos Mensuales</label>
+        <select class="select" name="gastos" required>
+          <option value="">ej: $500K – $1M</option>
+          <option>Menos de $500K</option>
+          <option>$500K – $1M</option>
+          <option>$1M – $3M</option>
+          <option>$3M – $5M</option>
+          <option>Más de $5M</option>
+        </select>
+
+        <label class="field-label">Dirección de Residencia</label>
+        <input class="input" name="direccion" placeholder="Dirección de Residencia" required />
+
+        <div style="height: 16px"></div>
+        <button type="submit" class="btn btn-primary">Continuar</button>
+      </form>
+    </section>
+
+    <!-- ============== SCREEN 4: Identity ============== -->
+    <section class="screen" data-screen="step3">
+      <div class="progress-wrap">
+        <div class="progress-row">
+          <div class="progress-track"><div class="progress-fill" style="width: 75%"></div></div>
+          <span class="progress-label">75%</span>
+        </div>
+      </div>
+      <div class="screen-pad" style="display: flex; flex-direction: column; flex: 1;">
+        <h1>Verifiquemos tu identidad</h1>
+        <p class="subtitle">Por tu seguridad, prepararemos tus documentos y biometría</p>
+
+        <div class="id-content">
+          <div class="id-cards">
+            <button type="button" class="id-card" data-capture="front">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              <div class="label" data-label="front">Foto Frontal Cédula</div>
+            </button>
+            <button type="button" class="id-card" data-capture="back">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              <div class="label" data-label="back">Foto Reverso Cédula</div>
+            </button>
+          </div>
+
+          <div class="face-area">
+            <div class="face-ring">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 7V5a1 1 0 0 1 1-1h2M20 7V5a1 1 0 0 0-1-1h-2M4 17v2a1 1 0 0 0 1 1h2M20 17v2a1 1 0 0 1-1 1h-2"/>
+                <circle cx="9" cy="11" r="0.8" fill="currentColor"/>
+                <circle cx="15" cy="11" r="0.8" fill="currentColor"/>
+                <path d="M9 15c1.5 1 4.5 1 6 0"/>
+              </svg>
+            </div>
+            <div class="face-hints">
+              <div>↖ Mira a la izquierda</div>
+              <div>↗ Mira a la derecha</div>
+              <div class="face-hint-bottom">↓ Mira abajo</div>
+            </div>
+          </div>
+
+          <p class="id-helper">Sigue las instrucciones en pantalla para la prueba de vida.</p>
+        </div>
+
+        <div style="height: 14px"></div>
+        <button type="button" class="btn btn-primary" id="btn-validate">Comenzar Validación</button>
+        <div class="id-status" id="id-status">Validando información con centrales…</div>
+      </div>
+    </section>
+
+    <!-- ============== SCREEN 5: Home ============== -->
+    <section class="screen" data-screen="home">
+      <div class="home">
+        <div class="home-header">
+          <div class="avatar" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+          </div>
+          <div class="header-icons">
+            <button class="header-icon-btn" title="Mensajes">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+            </button>
+            <button class="header-icon-btn" title="Notificaciones">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+              <span class="badge-dot"></span>
+            </button>
+          </div>
+        </div>
+
+        <h2 class="greeting">¡Bienvenido, <span id="user-name">Andrés</span>! 👋</h2>
+
+        <div class="account-card">
+          <div class="label">Número de Cuenta</div>
+          <div class="number">•••• •••• 4729</div>
+          <div class="balance-label">Saldo Disponible:</div>
+          <div class="balance">$0.00</div>
+          <div class="account-actions">
+            <button class="account-btn" data-action="recargar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              Recargar
+            </button>
+            <button class="account-btn" data-action="transferir">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3l4 4-4 4M3 7h18M7 21l-4-4 4-4M21 17H3"/></svg>
+              Transferir
+            </button>
+          </div>
+        </div>
+
+        <div class="carousel-dots">
+          <span class="dot active"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+
+        <div class="products">
+          <article class="product debit">
+            <div class="product-banner chip-bg"></div>
+            <div>
+              <div class="title">Tarjeta Débito Virtual</div>
+              <div class="desc">Lista para usar</div>
+            </div>
+            <button class="cta" data-action="activar">Activar</button>
+          </article>
+          <article class="product credit">
+            <div class="product-banner chip-bg"></div>
+            <div>
+              <div class="title">Tarjeta de Crédito</div>
+              <div class="desc">Solicitar en 2 min</div>
+            </div>
+            <button class="cta ghost" data-action="solicitar">Solicitar →</button>
+          </article>
+          <article class="product cdt">
+            <div class="product-banner chip-bg"></div>
+            <div>
+              <div class="title">CDT</div>
+              <div class="desc">Gana hasta 11% E.A.</div>
+            </div>
+            <button class="cta ghost" data-action="cdt">Abrir →</button>
+          </article>
+        </div>
+      </div>
+
+      <nav class="bottom-nav">
+        <button class="nav-item active" data-nav="inicio">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2h-4v-7H9v7H5a2 2 0 0 1-2-2z"/></svg>
+          Inicio
+        </button>
+        <button class="nav-item" data-nav="movimientos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l4-4 4 4 5-5M14 8h6v6"/></svg>
+          Movimientos
+        </button>
+        <button class="nav-item" data-nav="productos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+          Productos
+        </button>
+        <button class="nav-item" data-nav="perfil">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>
+          Perfil
+        </button>
+      </nav>
+    </section>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+  // ---------- state ----------
+  const state = { user: {} };
+
+  // ---------- helpers ----------
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+  function showScreen(name) {
+    $$('.screen').forEach(s => s.classList.toggle('active', s.dataset.screen === name));
+    $$('#devNav button').forEach(b => b.classList.toggle('current', b.dataset.go === name));
+    const active = $(`.screen[data-screen="${name}"]`);
+    if (active) active.scrollTop = 0;
+  }
+
+  function toast(msg, ms = 1800) {
+    const el = $('#toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => el.classList.remove('show'), ms);
+  }
+
+  // ---------- dev nav ----------
+  $$('#devNav button').forEach(b => {
+    b.addEventListener('click', () => showScreen(b.dataset.go));
+  });
+
+  // ---------- screen 1: splash ----------
+  $$('[data-action="go-step1"]').forEach(b => b.addEventListener('click', () => showScreen('step1')));
+  $$('[data-action="signin"]').forEach(b => b.addEventListener('click', () => toast('Pantalla de inicio de sesión (pendiente)')));
+  $$('[data-action="oauth"]').forEach(b => b.addEventListener('click', e => {
+    toast(`Continuar con ${e.currentTarget.dataset.provider} (pendiente)`);
+  }));
+
+  // ---------- screen 2: step1 form ----------
+  $('#form-step1').addEventListener('submit', e => {
+    e.preventDefault();
+    const data = new FormData(e.currentTarget);
+    if (!data.get('nombres') || !data.get('apellido') || !data.get('documento') || !data.get('email') || !data.get('telefono')) {
+      toast('Completa todos los campos para continuar');
+      return;
+    }
+    if (!data.get('terminos')) {
+      toast('Debes aceptar los términos y condiciones');
+      return;
+    }
+    state.user.nombres = data.get('nombres');
+    state.user.apellido = data.get('apellido');
+    state.user.documento = data.get('documento');
+    state.user.email = data.get('email');
+    state.user.telefono = data.get('telefono');
+    showScreen('step2');
+  });
+
+  // ---------- screen 3: step2 form ----------
+  $('#form-step2').addEventListener('submit', e => {
+    e.preventDefault();
+    const data = new FormData(e.currentTarget);
+    const required = ['nacimiento', 'expedicion', 'actividad', 'ingresos', 'gastos', 'direccion'];
+    for (const k of required) {
+      if (!data.get(k)) {
+        toast('Completa todos los campos para continuar');
+        return;
+      }
+    }
+    required.forEach(k => state.user[k] = data.get(k));
+    showScreen('step3');
+  });
+
+  // ---------- screen 4: identity ----------
+  $$('[data-capture]').forEach(card => {
+    card.addEventListener('click', () => {
+      const side = card.dataset.capture;
+      card.classList.add('captured');
+      const lbl = card.querySelector('[data-label]');
+      lbl.textContent = side === 'front' ? '✓ Frontal capturada' : '✓ Reverso capturado';
+      toast('Imagen capturada (simulada)');
+    });
+  });
+
+  $('#btn-validate').addEventListener('click', () => {
+    const front = $('[data-capture="front"]').classList.contains('captured');
+    const back = $('[data-capture="back"]').classList.contains('captured');
+    if (!front || !back) {
+      toast('Captura ambas caras de la cédula primero');
+      return;
+    }
+    const btn = $('#btn-validate');
+    const status = $('#id-status');
+    btn.disabled = true;
+    btn.textContent = 'Validando…';
+    status.textContent = 'Validando información con centrales…';
+    setTimeout(() => {
+      const firstName = (state.user.nombres || 'Andrés').split(/[\s,]+/)[0];
+      $('#user-name').textContent = firstName;
+      btn.disabled = false;
+      btn.textContent = 'Comenzar Validación';
+      showScreen('home');
+    }, 1600);
+  });
+
+  // ---------- screen 5: home ----------
+  $$('.account-btn, .product .cta, .nav-item').forEach(b => {
+    b.addEventListener('click', e => {
+      const label = (e.currentTarget.dataset.action || e.currentTarget.dataset.nav || 'acción');
+      toast(`${label.charAt(0).toUpperCase() + label.slice(1)} (pendiente)`);
+      if (e.currentTarget.classList.contains('nav-item')) {
+        $$('.nav-item').forEach(n => n.classList.toggle('active', n === e.currentTarget));
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
