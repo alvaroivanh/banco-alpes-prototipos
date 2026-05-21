@@ -198,6 +198,15 @@
     font-weight: 600;
     color: var(--ink);
   }
+  .meta-team { grid-column: span 2; }
+  .meta-team .val {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  @media (max-width: 480px) {
+    .meta-team { grid-column: span 1; }
+  }
 
   /* ============ Section base ============ */
   section.block {
@@ -499,17 +508,21 @@
     </p>
 
     <div class="meta-grid">
-      <div class="meta-item">
-        <div class="key">Autor</div>
-        <div class="val">Álvaro I. Hernández V.</div>
+      <div class="meta-item meta-team">
+        <div class="key">Equipo</div>
+        <div class="val">
+          <span>Álvaro I. Hernández V.</span>
+          <span>Carlos Andrés Chaparro</span>
+          <span>Andrés Gaviria</span>
+        </div>
       </div>
       <div class="meta-item">
-        <div class="key">Curso</div>
-        <div class="val">— por completar —</div>
+        <div class="key">Materia</div>
+        <div class="val">Architecting Digital Enterprises</div>
       </div>
       <div class="meta-item">
         <div class="key">Profesor</div>
-        <div class="val">— por completar —</div>
+        <div class="val">Jorge Humberto Arias Bedoya</div>
       </div>
       <div class="meta-item">
         <div class="key">Fecha de entrega</div>
