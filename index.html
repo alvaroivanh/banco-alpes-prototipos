@@ -3,79 +3,698 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Prototipos — Banco los Alpes</title>
+<title>Banco los Alpes — Prototipos · Universidad de los Andes</title>
+<meta name="description" content="Prototipos de producto digital para Banco los Alpes — Trabajo académico Universidad de los Andes" />
 <style>
+  :root {
+    --uniandes-yellow: #f5b800;
+    --uniandes-yellow-dark: #d99e00;
+    --ink: #111418;
+    --ink-soft: #3a4250;
+    --muted: #6b7588;
+    --line: #e6e8ed;
+    --surface: #ffffff;
+    --bg: #fafbfc;
+    --accent: #1e63d7;
+    --shadow-sm: 0 1px 2px rgba(17, 20, 24, 0.05);
+    --shadow: 0 8px 24px rgba(17, 20, 24, 0.06);
+    --shadow-lg: 0 20px 50px rgba(17, 20, 24, 0.10);
+    --radius: 14px;
+  }
+
   * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: linear-gradient(135deg, #f4f6fa, #e3e8f0);
-    color: #0f1b2d;
-    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--uniandes-yellow); color: var(--ink); }
+
+  /* ============ Top bar ============ */
+  .topbar {
+    background: var(--ink);
+    color: #fff;
+    padding: 14px 0;
+    border-bottom: 4px solid var(--uniandes-yellow);
+  }
+  .topbar-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .logo-slot {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
     display: grid;
     place-items: center;
-    padding: 32px 20px;
   }
-  .wrap { max-width: 720px; width: 100%; }
-  h1 { font-size: 32px; margin: 0 0 8px; }
-  .lead { color: #6b7a90; margin: 0 0 28px; font-size: 15px; }
-  .grid {
+  .logo-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .logo-fallback {
+    width: 100%;
+    height: 100%;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 16px;
+    place-items: center;
+    color: var(--uniandes-yellow);
   }
-  .card {
+  .logo-fallback svg { width: 38px; height: 44px; }
+  .topbar-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+  }
+  .topbar-text .uni {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .topbar-text .fac {
+    font-size: 12px;
+    color: #c8cdd6;
+    margin-top: 2px;
+  }
+  .topbar-tag {
+    margin-left: auto;
+    font-size: 11px;
+    color: #c8cdd6;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* ============ Hero ============ */
+  .hero {
+    background: linear-gradient(180deg, #fff 0%, #fafbfc 100%);
+    border-bottom: 1px solid var(--line);
+    padding: 64px 24px 56px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -120px;
+    right: -120px;
+    width: 320px;
+    height: 320px;
+    background: var(--uniandes-yellow);
+    border-radius: 50%;
+    opacity: 0.10;
+    pointer-events: none;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    bottom: -80px;
+    left: -80px;
+    width: 220px;
+    height: 220px;
+    background: var(--accent);
+    border-radius: 50%;
+    opacity: 0.05;
+    pointer-events: none;
+  }
+  .hero-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(245, 184, 0, 0.15);
+    color: #8a6a00;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    background: var(--uniandes-yellow-dark);
+    border-radius: 50%;
+  }
+  h1.title {
+    font-size: clamp(32px, 5vw, 52px);
+    line-height: 1.08;
+    margin: 0 0 18px;
+    letter-spacing: -1px;
+    font-weight: 800;
+  }
+  .title .accent {
+    background: linear-gradient(120deg, var(--uniandes-yellow) 0%, var(--uniandes-yellow-dark) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  .lede {
+    font-size: 18px;
+    color: var(--ink-soft);
+    max-width: 680px;
+    margin: 0 0 32px;
+  }
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    max-width: 760px;
+    margin-top: 12px;
+  }
+  .meta-item {
     background: #fff;
-    border-radius: 16px;
-    padding: 22px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 16px;
+  }
+  .meta-item .key {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .meta-item .val {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* ============ Section base ============ */
+  section.block {
+    padding: 56px 24px;
+  }
+  .block-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+  .section-eyebrow {
+    font-size: 12px;
+    color: var(--uniandes-yellow-dark);
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin: 0 0 8px;
+  }
+  .section-title {
+    font-size: clamp(24px, 3vw, 32px);
+    margin: 0 0 12px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .section-lede {
+    font-size: 16px;
+    color: var(--ink-soft);
+    max-width: 720px;
+    margin: 0 0 36px;
+  }
+
+  /* ============ Prototype cards ============ */
+  .prototypes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 22px;
+  }
+  .proto {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
     text-decoration: none;
     color: inherit;
-    box-shadow: 0 8px 24px rgba(16, 36, 75, 0.08);
-    transition: transform 0.15s, box-shadow 0.15s;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s cubic-bezier(.2,.6,.2,1), box-shadow 0.2s, border-color 0.2s;
+    position: relative;
   }
-  .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(16, 36, 75, 0.12);
+  .proto:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--ink);
   }
-  .tag {
-    display: inline-block;
-    background: #e8f0fd;
-    color: #1e63d7;
+  .proto-mock {
+    height: 220px;
+    background: linear-gradient(135deg, #f3f6fa 0%, #e7ecf3 100%);
+    position: relative;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  .proto-mock svg.bg-pattern {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.4;
+  }
+  .device-mini {
+    width: 110px;
+    height: 180px;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(17, 20, 24, 0.20), 0 0 0 4px #111 inset, 0 0 0 5px #2a2a2a;
+    position: relative;
+    overflow: hidden;
+    transform: rotate(-6deg);
+    transition: transform 0.3s;
+  }
+  .device-mini.second {
+    transform: rotate(8deg) translate(20px, -10px);
+    z-index: 0;
+    opacity: 0.85;
+  }
+  .proto:hover .device-mini { transform: rotate(-3deg) scale(1.05); }
+  .proto:hover .device-mini.second { transform: rotate(5deg) translate(28px, -14px) scale(1.02); }
+  .device-mini .screen-mini {
+    position: absolute;
+    inset: 8px 4px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    padding: 8px 6px;
+    font-size: 5px;
+    gap: 4px;
+  }
+  .proto-body {
+    padding: 22px 22px 24px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .proto-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(30, 99, 215, 0.08);
+    color: var(--accent);
     font-size: 11px;
     font-weight: 700;
-    padding: 3px 8px;
+    padding: 4px 10px;
     border-radius: 999px;
-    margin-bottom: 10px;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    width: max-content;
+    margin-bottom: 12px;
   }
-  .card h2 { font-size: 20px; margin: 0 0 6px; }
-  .card p { color: #6b7a90; margin: 0 0 12px; font-size: 14px; line-height: 1.5; }
-  .card .cta { color: #1e63d7; font-weight: 600; font-size: 14px; }
-  footer { margin-top: 28px; font-size: 12px; color: #6b7a90; text-align: center; }
+  .proto h3 {
+    font-size: 22px;
+    margin: 0 0 6px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+  .proto p {
+    color: var(--ink-soft);
+    margin: 0 0 18px;
+    font-size: 14px;
+  }
+  .proto-screens {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 22px;
+  }
+  .proto-screens span {
+    font-size: 11px;
+    color: var(--ink-soft);
+    background: #f3f5f9;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+  .proto-cta {
+    margin-top: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .proto-cta svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.2s;
+  }
+  .proto:hover .proto-cta svg { transform: translateX(4px); }
+
+  /* TarjetApp mock colors */
+  .mock-tarjetapp .screen-mini { background: linear-gradient(180deg, #1e63d7 0%, #2a78ef 100%); }
+  .mock-tarjetapp .second .screen-mini { background: #fff; }
+  .mock-tarjetapp .row { height: 6px; border-radius: 2px; }
+  .mock-tarjetapp .first .row.tall { height: 14px; background: rgba(255,255,255,0.3); width: 60%; margin: 4px auto 6px; }
+  .mock-tarjetapp .first .row { background: rgba(255,255,255,0.25); }
+  .mock-tarjetapp .second .row { background: #e3e8f0; }
+  .mock-tarjetapp .second .row.primary { background: var(--accent); }
+
+  /* Comercio mock colors */
+  .mock-comercio .screen-mini { background: #fff; }
+  .mock-comercio .row { height: 6px; border-radius: 2px; background: #e3e8f0; }
+  .mock-comercio .row.primary { background: var(--accent); }
+  .mock-comercio .row.yellow { background: var(--uniandes-yellow); }
+  .mock-comercio .second .screen-mini { background: #f3f7fe; }
+
+  /* ============ How to use ============ */
+  .usage {
+    background: #fff;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+    margin-top: 8px;
+  }
+  .step {
+    padding: 22px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--bg);
+    position: relative;
+  }
+  .step-num {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--uniandes-yellow);
+    font-weight: 800;
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+  .step h4 { margin: 0 0 6px; font-size: 16px; }
+  .step p { margin: 0; font-size: 13px; color: var(--ink-soft); }
+  .step code {
+    display: block;
+    background: var(--ink);
+    color: #e6e8ed;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    margin-top: 10px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  /* ============ Footer ============ */
+  footer.foot {
+    background: var(--ink);
+    color: #c8cdd6;
+    padding: 36px 24px 28px;
+    font-size: 13px;
+  }
+  .foot-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .foot a {
+    color: var(--uniandes-yellow);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .foot a:hover { text-decoration: underline; }
+  .foot-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .foot-brand .bar {
+    display: inline-block;
+    width: 4px;
+    height: 18px;
+    background: var(--uniandes-yellow);
+    border-radius: 2px;
+  }
+
+  @media (max-width: 640px) {
+    .topbar-tag { display: none; }
+    .hero { padding: 44px 24px 40px; }
+    section.block { padding: 44px 24px; }
+    .foot-inner { flex-direction: column; align-items: flex-start; }
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>Prototipos interactivos</h1>
-  <p class="lead">Selecciona un prototipo para abrirlo. Cada uno es un archivo HTML independiente, sin dependencias.</p>
 
-  <div class="grid">
-    <a class="card" href="tarjetapp/index.html">
-      <span class="tag">5 PANTALLAS</span>
-      <h2>TarjetApp</h2>
-      <p>Onboarding de cliente: registro, validación de identidad y home con cuentas y productos.</p>
-      <span class="cta">Abrir prototipo →</span>
-    </a>
-    <a class="card" href="comercio360/index.html">
-      <span class="tag">5 PANTALLAS</span>
-      <h2>Comercio 360</h2>
-      <p>Panel para comercios: dashboard de ventas, reportes, solicitud de liquidez y dispersión de fondos.</p>
-      <span class="cta">Abrir prototipo →</span>
-    </a>
+<!-- ============ Top bar ============ -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="logo-slot" aria-label="Universidad de los Andes">
+      <img
+        src="assets/uniandes-logo.svg"
+        alt="Universidad de los Andes"
+        onerror="this.onerror=null; this.src='assets/uniandes-logo.png'; this.onerror=function(){this.style.display='none'; this.nextElementSibling.style.display='grid';};"
+      />
+      <div class="logo-fallback" style="display: none;" aria-hidden="true">
+        <svg viewBox="0 0 38 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 2 H36 V28 Q36 38 19 42 Q2 38 2 28 Z" fill="currentColor" stroke="currentColor" stroke-width="2"/>
+          <path d="M2 2 L19 22 L36 2" stroke="#111418" stroke-width="2.5" fill="none"/>
+          <text x="19" y="34" text-anchor="middle" fill="#111418" font-family="Georgia, serif" font-weight="700" font-size="11">U</text>
+        </svg>
+      </div>
+    </div>
+    <div class="topbar-text">
+      <span class="uni">Universidad de los Andes</span>
+      <span class="fac">Facultad de Ingeniería</span>
+    </div>
+    <span class="topbar-tag">Trabajo académico</span>
   </div>
-
-  <footer>Banco los Alpes · Prototipos HTML estáticos</footer>
 </div>
+
+<!-- ============ Hero ============ -->
+<section class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow">Banco los Alpes · Caso de estudio</span>
+    <h1 class="title">Prototipos de <span class="accent">producto digital</span> para banca y comercios</h1>
+    <p class="lede">
+      Dos aplicaciones interactivas que exploran el journey completo del cliente y la operación de comercios:
+      desde el onboarding y activación hasta el dashboard transaccional, financiación y dispersión de fondos.
+    </p>
+
+    <div class="meta-grid">
+      <div class="meta-item">
+        <div class="key">Autor</div>
+        <div class="val">Álvaro I. Hernández V.</div>
+      </div>
+      <div class="meta-item">
+        <div class="key">Curso</div>
+        <div class="val">— por completar —</div>
+      </div>
+      <div class="meta-item">
+        <div class="key">Profesor</div>
+        <div class="val">— por completar —</div>
+      </div>
+      <div class="meta-item">
+        <div class="key">Fecha de entrega</div>
+        <div class="val">Mayo 2026</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Prototypes ============ -->
+<section class="block" id="prototipos">
+  <div class="block-inner">
+    <p class="section-eyebrow">Entregables</p>
+    <h2 class="section-title">Dos prototipos funcionales</h2>
+    <p class="section-lede">
+      Cada prototipo es navegable, con formularios editables y validación básica. Construidos en HTML/CSS/JS
+      sin dependencias para garantizar portabilidad y revisión sin instalaciones.
+    </p>
+
+    <div class="prototypes">
+
+      <!-- TarjetApp -->
+      <a class="proto" href="tarjetapp/index.html">
+        <div class="proto-mock">
+          <svg class="bg-pattern" viewBox="0 0 200 200" preserveAspectRatio="none">
+            <defs>
+              <pattern id="dots1" width="14" height="14" patternUnits="userSpaceOnUse">
+                <circle cx="2" cy="2" r="1" fill="#1e63d7" opacity="0.3"/>
+              </pattern>
+            </defs>
+            <rect width="200" height="200" fill="url(#dots1)"/>
+          </svg>
+          <div class="mock-tarjetapp" style="position: relative; width: 200px; height: 200px;">
+            <div class="device-mini first" style="position: absolute; left: 20px; top: 20px;">
+              <div class="screen-mini">
+                <div class="row tall"></div>
+                <div class="row" style="width: 70%; margin: 0 auto;"></div>
+                <div class="row" style="width: 50%; margin: 0 auto;"></div>
+                <div style="flex: 1"></div>
+                <div class="row" style="width: 90%; height: 14px; background: #fff; border-radius: 4px; margin: 0 auto;"></div>
+              </div>
+            </div>
+            <div class="device-mini second" style="position: absolute; right: 14px; top: 16px;">
+              <div class="screen-mini">
+                <div class="row" style="width: 50%; height: 8px; margin-bottom: 4px;"></div>
+                <div class="row" style="width: 80%;"></div>
+                <div class="row" style="width: 80%;"></div>
+                <div class="row" style="width: 80%;"></div>
+                <div class="row" style="width: 80%;"></div>
+                <div style="flex: 1"></div>
+                <div class="row primary" style="width: 100%; height: 10px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="proto-body">
+          <span class="proto-tag">App de cliente</span>
+          <h3>TarjetApp</h3>
+          <p>Onboarding completo con validación biométrica, registro paso a paso y home con productos financieros.</p>
+          <div class="proto-screens">
+            <span>Splash</span>
+            <span>Registro 25%</span>
+            <span>Registro 50%</span>
+            <span>Identidad 75%</span>
+            <span>Home</span>
+          </div>
+          <span class="proto-cta">
+            Abrir prototipo
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <!-- Comercio 360 -->
+      <a class="proto" href="comercio360/index.html">
+        <div class="proto-mock">
+          <svg class="bg-pattern" viewBox="0 0 200 200" preserveAspectRatio="none">
+            <defs>
+              <pattern id="dots2" width="14" height="14" patternUnits="userSpaceOnUse">
+                <circle cx="2" cy="2" r="1" fill="#f5b800" opacity="0.4"/>
+              </pattern>
+            </defs>
+            <rect width="200" height="200" fill="url(#dots2)"/>
+          </svg>
+          <div class="mock-comercio" style="position: relative; width: 200px; height: 200px;">
+            <div class="device-mini first" style="position: absolute; left: 20px; top: 20px;">
+              <div class="screen-mini">
+                <div class="row primary" style="width: 60%; height: 8px; margin-bottom: 6px;"></div>
+                <div class="row primary" style="width: 80%; height: 12px;"></div>
+                <div class="row" style="width: 50%;"></div>
+                <div class="row" style="width: 50%;"></div>
+                <div style="flex: 1; display: flex; align-items: flex-end; gap: 2px;">
+                  <div style="width: 8px; height: 12px; background: #1e63d7; border-radius: 1px;"></div>
+                  <div style="width: 8px; height: 20px; background: #1e63d7; border-radius: 1px;"></div>
+                  <div style="width: 8px; height: 16px; background: #1e63d7; border-radius: 1px;"></div>
+                  <div style="width: 8px; height: 26px; background: #1e63d7; border-radius: 1px;"></div>
+                  <div style="width: 8px; height: 22px; background: #1e63d7; border-radius: 1px;"></div>
+                  <div style="width: 8px; height: 32px; background: #1e63d7; border-radius: 1px;"></div>
+                </div>
+              </div>
+            </div>
+            <div class="device-mini second" style="position: absolute; right: 14px; top: 16px;">
+              <div class="screen-mini">
+                <div class="row" style="width: 70%; height: 8px;"></div>
+                <div class="row yellow" style="width: 90%; height: 14px;"></div>
+                <div class="row" style="width: 60%;"></div>
+                <div class="row" style="width: 80%;"></div>
+                <div style="flex: 1"></div>
+                <div class="row primary" style="width: 100%; height: 12px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="proto-body">
+          <span class="proto-tag">Panel de comercios</span>
+          <h3>Comercio 360</h3>
+          <p>Dashboard de ventas, generación de reportes, solicitud de liquidez y dispersión de fondos a comercios.</p>
+          <div class="proto-screens">
+            <span>Login</span>
+            <span>Dashboard</span>
+            <span>Reportes</span>
+            <span>Liquidez</span>
+            <span>Dispersión</span>
+          </div>
+          <span class="proto-cta">
+            Abrir prototipo
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ How to use ============ -->
+<section class="block usage" id="uso">
+  <div class="block-inner">
+    <p class="section-eyebrow">Guía rápida</p>
+    <h2 class="section-title">Cómo navegar los prototipos</h2>
+    <p class="section-lede">
+      Cada pantalla incluye un atajo flotante (esquina superior derecha) con botones 1–5 para saltar
+      entre flujos sin tener que completarlos. Ideal para sustentaciones y demos.
+    </p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h4>Abrir la portada</h4>
+        <p>Doble clic en <code>index.html</code> o ejecuta:</p>
+        <code>open index.html</code>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h4>Servir localmente</h4>
+        <p>Para una experiencia más fiel (rutas reales) levanta un servidor estático:</p>
+        <code>python3 -m http.server 8000</code>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h4>Elegir prototipo</h4>
+        <p>Desde esta portada haz clic en la tarjeta de TarjetApp o Comercio 360 para iniciar el flujo correspondiente.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h4>Sustentar</h4>
+        <p>Usa los botones 1–5 flotantes para mostrar cualquier pantalla específica durante la presentación.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Footer ============ -->
+<footer class="foot">
+  <div class="foot-inner">
+    <div class="foot-brand">
+      <span class="bar"></span>
+      <span>Universidad de los Andes · Banco los Alpes</span>
+    </div>
+    <div>
+      Código fuente disponible en
+      <a href="https://github.com/alvaroivanh/banco-alpes-prototipos" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</footer>
+
 </body>
 </html>
